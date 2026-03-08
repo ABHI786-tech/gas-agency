@@ -5,7 +5,22 @@
   --foreground: #171717;
 }
 
-*{
+* {
   box-sizing: border-box;
- color: black;
+}
+
+
+#registerationForm, #loginForm {
+  width: 650px;
+
+}
+
+#registerationForm input, #loginForm input {
+  height: 52px;
+  margin-top: 5px;
+}
+
+
+#registerationForm select {
+  height: 52px;
 }

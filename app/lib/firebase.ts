@@ -2,21 +2,24 @@
 import { initializeApp } from "firebase/app";
 // import { getAnalytics } from "firebase/analytics";
 import { getAuth } from "firebase/auth";
-import { getFirestore } from "firebase/firestore";
+import { collection, getDocs, getFirestore } from "firebase/firestore";
+
+
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries
 
 // Your web app's Firebase configuration
 // For Firebase JS SDK v7.20.0 and later, measurementId is optional
 const firebaseConfig = {
-  apiKey: "AIzaSyBis8DEuy_QYgdh3eABUY6B2utMb77kGxw",
-  authDomain: "gas-agency-client.firebaseapp.com",
-  projectId: "gas-agency-client",
-  storageBucket: "gas-agency-client.firebasestorage.app",
-  messagingSenderId: "658665710124",
-  appId: "1:658665710124:web:72ad165a763fbbddb4a789",
-  measurementId: "G-HSB7VF1J55"
+  apiKey: process.env.NEXT_PUBLIC_API_KEY,
+  authDomain: process.env.NEXT_PUBLIC_AUTHDOMAIN,
+  projectId: process.env.NEXT_PUBLIC_PROJECT_ID,
+  storageBucket: process.env.NEXT_PUBLIC_STORAGE_BUCKET,
+  messagingSenderId: process.env.NEXT_PUBLIC_MESSAGING_SENDER_ID,
+  appId: process.env.NEXT_PUBLIC_APP_ID,
+  measurementId: process.env.NEXT_PUBLIC_MEASUREMENT_ID
 };
+
 
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
@@ -25,3 +28,13 @@ export const auth = getAuth(app);
 
 // Firestore DB
 export const db = getFirestore(app);
+
+
+
+// Get a list of cities from your database
+export async function getCities(db: any) {
+  const citiesCol = collection(db, 'cities');
+  const citySnapshot = await getDocs(citiesCol);
+  const cityList = citySnapshot.docs.map(doc => doc.data());
+  return cityList;
+}

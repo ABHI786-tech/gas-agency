@@ -1,173 +1,212 @@
 "use client";
 
-import React, { useState, ChangeEvent, FormEvent } from "react";
-import { createUserWithEmailAndPassword, updateProfile, UserCredential } from "firebase/auth";
-import { auth } from "@/app/lib/firebase";
+import React from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
+import { SubmitHandler, useForm } from "react-hook-form";
+import { CustomInput } from "@/app/common/CustomInput";
+import { createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
+import { auth } from "@/app/lib/firebase";
+import { toast } from "react-toastify";
 
 interface FormData {
   name: string;
   email: string;
   password: string;
-  phone: string;
+  phone: number;
   address: string;
   connectionType: "Domestic" | "Commercial";
 }
 
 const Register: React.FC = () => {
   const router = useRouter();
+  const {
+    register,
+    handleSubmit,
+    getValues,
+    watch,
+    formState: { errors, isSubmitting },
+  } = useForm<FormData>();
 
-  const [formData, setFormData] = useState<FormData>({
-    name: "",
-    email: "",
-    password: "",
-    phone: "",
-    address: "",
-    connectionType: "Domestic",
-  });
-
-  const [loading, setLoading] = useState<boolean>(false);
-
-  // Input handler
-  const inputHandler = (
-    e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
-  ) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
-  };
-
-  // Submit handler
-  const onSubmitHandler = async (e: FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    setLoading(true);
-
+  const onSubmit: SubmitHandler<FormData> = async (data) => {
+    console.log("data", data);
     try {
-      const userCredential: UserCredential =
-        await createUserWithEmailAndPassword(
-          auth,
-          formData.email,
-          formData.password
-        );
+      const userCredential = await createUserWithEmailAndPassword(
+        auth,
+        data.email,
+        data.password,
+      );
 
       await updateProfile(userCredential.user, {
-        displayName: formData.name,
+        displayName: data.name,
       });
 
-      alert("Registration Successful ✅");
+      toast.success("Registration Successful ✅");
 
-      setFormData({
-        name: "",
-        email: "",
-        password: "",
-        phone: "",
-        address: "",
-        connectionType: "Domestic",
-      });
+      router.push("/login");
+    } catch (error: any) {
+      let message = "Something went wrong";
 
-      router.push("/");
-    } catch (error: unknown) {
-      if (error instanceof Error) {
-        alert(error.message.replace("Firebase:", ""));
+      if (error.code === "auth/email-already-in-use") {
+        message = "Email already exists. Please use another email.";
+      } else if (error.code === "auth/invalid-email") {
+        message = "Invalid email address.";
+      } else if (error.code === "auth/weak-password") {
+        message = "Password should be at least 6 characters.";
       } else {
-        alert("Something went wrong");
+        message = error.message.replace("Firebase:", "");
       }
-    } finally {
-      setLoading(false);
+
+      toast.error(message);
     }
   };
+
+  console.log("isSubmitting", isSubmitting);
+  console.log("register errors", errors);
 
   return (
     <div className="flex flex-col md:flex-row min-h-screen">
       {/* Left - Form */}
-      <div className="flex-1 flex items-center justify-center bg-gray-200 p-6">
+      <div className="flex-1 flex items-center justify-center p-6">
         <form
-          onSubmit={onSubmitHandler}
-          className="bg-white p-8 rounded-lg shadow-md w-full max-w-md"
+          onSubmit={handleSubmit(onSubmit)}
+          className="p-8 rounded-lg w-full "
+          id="registerationForm"
         >
-          <h2 className="text-2xl font-extrabold text-center mb-6 text-orange-700">
+          <h2 className="text-2xl font-extrabold text-center mb-6 text-orange-600">
             Gas Agency Registration
           </h2>
 
           {/* Name */}
-          <div className="mb-3">
-            <label className="font-semibold">Full Name</label>
-            <input
-              type="text"
-              name="name"
-              value={formData.name}
-              onChange={inputHandler}
-              className="w-full px-3 py-2 border rounded"
-              placeholder="Enter your name"
-              required
-            />
-          </div>
+          <CustomInput
+            register={register}
+            name="name"
+            label="Full Name"
+            placeholder="Enter your name"
+            type="text"
+            isRequired={true}
+            validation={{
+              required: {
+                value: true,
+                message: "Name is required",
+              },
+
+              maxLength: {
+                value: 20,
+                message: "Name must be at most 20 characters long",
+              },
+            }}
+            onKeyDown={(e: React.KeyboardEvent<HTMLInputElement>) => {
+              if (!/^[a-zA-Z ]+$/.test(e.key)) {
+                e.preventDefault();
+              }
+            }}
+          />
+          {errors.name && (
+            <p className="text-red-500 mb-2">{errors.name.message}</p>
+          )}
 
           {/* Phone */}
-          <div className="mb-3">
-            <label className="font-semibold">Mobile Number</label>
-            <input
-              type="tel"
-              name="phone"
-              value={formData.phone}
-              onChange={inputHandler}
-              className="w-full px-3 py-2 border rounded"
-              placeholder="Enter mobile number"
-              required
-            />
-          </div>
+          <CustomInput
+            register={register}
+            name="phone"
+            label="Mobile Number"
+            placeholder="Enter mobile number"
+            type="tel"
+            isRequired={true}
+            validation={{
+              required: {
+                value: true,
+                message: "Mobile number is required",
+              },
+              pattern: {
+                value: /^[0-9]{10}$/,
+                message: "Mobile number must be 10 digits",
+              },
+            }}
+            onKeyDown={(e: React.KeyboardEvent<HTMLInputElement>) => {
+              if (
+                (!/^[0-9]$/.test(e.key) && e.key.length === 1) ||
+                (e.currentTarget.value.length >= 10 && /^[0-9]$/.test(e.key))
+              )
+                e.preventDefault();
+            }}
+          />
+          {errors.phone && (
+            <p className="text-red-500 mb-2">{errors.phone.message}</p>
+          )}
 
           {/* Email */}
-          <div className="mb-3">
-            <label className="font-semibold">Email</label>
-            <input
-              type="email"
-              name="email"
-              value={formData.email}
-              onChange={inputHandler}
-              className="w-full px-3 py-2 border rounded"
-              placeholder="Enter email"
-              required
-            />
-          </div>
+          <CustomInput
+            register={register}
+            name="email"
+            label="Email"
+            placeholder="Enter email"
+            type="text"
+            isRequired={true}
+            validation={{
+              required: {
+                value: true,
+                message: "Email is required",
+              },
+              pattern: {
+                value: /@/,
+                message: "Email is invalid",
+              },
+            }}
+          />
+          {errors.email && (
+            <p className="text-red-500 mb-2">{errors.email.message}</p>
+          )}
 
           {/* Password */}
-          <div className="mb-3">
-            <label className="font-semibold">Password</label>
-            <input
-              type="password"
-              name="password"
-              value={formData.password}
-              onChange={inputHandler}
-              className="w-full px-3 py-2 border rounded"
-              placeholder="Enter password"
-              required
-            />
-          </div>
+          <CustomInput
+            register={register}
+            name="password"
+            label="Password"
+            placeholder="Enter password"
+            type="text"
+            isRequired={true}
+            validation={{
+              required: {
+                value: true,
+                message: "Password is required",
+              },
+              minLength: {
+                value: 6,
+                message: "Password must be at least 6 characters long",
+              },
+            }}
+          />
+          {errors.password && (
+            <p className="text-red-500 mb-2">{errors.password.message}</p>
+          )}
 
           {/* Address */}
-          <div className="mb-3">
-            <label className="font-semibold">Address</label>
-            <textarea
-              name="address"
-              value={formData.address}
-              onChange={inputHandler}
-              className="w-full px-3 py-2 border rounded"
-              placeholder="Enter address"
-              required
-            />
-          </div>
+          <CustomInput
+            register={register}
+            name="address"
+            label="Address"
+            placeholder="Enter address"
+            type="text"
+            isRequired={true}
+            validation={{
+              required: {
+                value: true,
+                message: "Address is required",
+              },
+            }}
+          />
+          {errors.address && (
+            <p className="text-red-500 mb-2">{errors.address.message}</p>
+          )}
 
           {/* Connection Type */}
           <div className="mb-4">
             <label className="font-semibold">Connection Type</label>
             <select
+              {...register("connectionType")}
               name="connectionType"
-              value={formData.connectionType}
-              onChange={inputHandler}
               className="w-full px-3 py-2 border rounded"
             >
               <option value="Domestic">Domestic</option>
@@ -177,18 +216,18 @@ const Register: React.FC = () => {
 
           <button
             type="submit"
-            disabled={loading}
-            className="w-full bg-orange-600 text-white py-2 rounded hover:bg-orange-700"
+            disabled={isSubmitting}
+            className="w-full bg-orange-600 text-white py-2 rounded hover:bg-orange-400"
           >
-            {loading ? "Registering..." : "Register"}
+            {isSubmitting ? "Registering..." : "Register"}
           </button>
 
           <p className="text-sm text-center mt-4">
-            Already have an account?{" "}
+            Already have an account?
             <button
               type="button"
               onClick={() => router.push("/login")}
-              className="text-orange-600 font-bold"
+              className="text-orange-600 font-bold px-2"
             >
               Login
             </button>
