@@ -7,6 +7,7 @@ import { SubmitHandler, useForm } from "react-hook-form";
 import { CustomInput } from "@/app/common/CustomInput";
 import { createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
 import { auth } from "@/app/lib/firebase";
+import { createUserProfile } from "@/app/lib/firestore";
 import { toast } from "react-toastify";
 
 interface FormData {
@@ -29,20 +30,30 @@ const Register: React.FC = () => {
   } = useForm<FormData>();
 
   const onSubmit: SubmitHandler<FormData> = async (data) => {
-    console.log("data", data);
     try {
+      // 1. Create Firebase Auth account
       const userCredential = await createUserWithEmailAndPassword(
         auth,
         data.email,
         data.password,
       );
 
+      // 2. Set display name in Firebase Auth
       await updateProfile(userCredential.user, {
         displayName: data.name,
       });
 
-      toast.success("Registration Successful ✅");
+      // 3. Save full profile to Firestore `users` collection
+      await createUserProfile({
+        uid: userCredential.user.uid,
+        name: data.name,
+        email: data.email,
+        phone: String(data.phone),
+        address: data.address,
+        connectionType: data.connectionType,
+      });
 
+      toast.success("Registration Successful ✅");
       router.push("/login");
     } catch (error: any) {
       let message = "Something went wrong";
@@ -58,6 +69,7 @@ const Register: React.FC = () => {
       }
 
       toast.error(message);
+      console.log("message", message);
     }
   };
 

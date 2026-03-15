@@ -87,9 +87,11 @@ const Header = () => {
           <div className="w-24 h-10 bg-gray-200 animate-pulse rounded-lg"></div>
         ) : user ? (
           <div className="flex items-center gap-3 relative profile-dropdown-container">
-            <button className="bg-orange-500 hover:bg-orange-700 text-white px-6 py-2.5 rounded-lg font-semibold transition-all shadow-md active:scale-95">
-              Order Cylinder
-            </button>
+            <Link href="/book-cylinder">
+              <button className="bg-orange-500 hover:bg-orange-700 text-white px-6 py-2.5 rounded-lg font-semibold transition-all shadow-md active:scale-95">
+                Order Cylinder
+              </button>
+            </Link>
             <button
               onClick={() => setIsDropdownOpen(!isDropdownOpen)}
               className="flex items-center justify-center w-10 h-10 bg-gray-100 rounded-full hover:bg-gray-200 transition-colors focus:ring-2 focus:ring-orange-500 focus:outline-none"
@@ -127,6 +129,13 @@ const Header = () => {
                     className="block px-4 py-2 text-sm text-gray-700 hover:bg-orange-50 hover:text-orange-600 transition-colors"
                   >
                     Profile
+                  </Link>
+                  <Link
+                    href="/history"
+                    onClick={() => setIsDropdownOpen(false)}
+                    className="block px-4 py-2 text-sm text-gray-700 hover:bg-orange-50 hover:text-orange-600 transition-colors"
+                  >
+                    Booking History
                   </Link>
                   <Link
                     href="/settings"

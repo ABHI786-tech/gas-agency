@@ -41,6 +41,10 @@ export default function SafetyPage() {
       badge: "Essential",
       imageUrl:
         "https://images.unsplash.com/photo-1585832770485-e68a5dbcf50d?auto=format&fit=crop&q=80&w=600",
+      price: 199,
+      originalPrice: 299,
+      rating: 4.8,
+      reviews: 1250,
     },
     {
       name: "LPG Leakage Detector",
@@ -48,7 +52,11 @@ export default function SafetyPage() {
       icon: "🚨",
       badge: "Highly Recommended",
       imageUrl:
-        "https://images.unsplash.com/photo-1558002038-1055907df827?auto=format&fit=crop&q=80&w=600",
+        "https://images.unsplash.com/photo-1650551182991-b07558247564?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8NzF8fGdhcyUyMGxlYWthZ2UlMjBkZXRlY3RvcnxlbnwwfHwwfHx8MA%3D%3D",
+      price: 799,
+      originalPrice: 1299,
+      rating: 4.6,
+      reviews: 840,
     },
     {
       name: "Fire Extinguisher (ABC Type)",
@@ -56,15 +64,22 @@ export default function SafetyPage() {
       icon: "🧯",
       badge: "Must Have",
       imageUrl:
-        "https://images.unsplash.com/photo-1583345228518-e2ebba75c80d?auto=format&fit=crop&q=80&w=600",
+        "https://images.unsplash.com/photo-1595306394931-b35768661692?q=80&w=870&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+      price: 1299,
+      originalPrice: 1999,
+      rating: 4.9,
+      reviews: 3200,
     },
     {
       name: "Standard LPG Regulator",
       desc: "High-quality pressure regulator ensuring consistent and safe flow from cylinder to stove.",
       icon: "⚙️",
       badge: "Essential",
-      imageUrl:
-        "https://images.unsplash.com/photo-1605518216938-7c31b7b14ad0?auto=format&fit=crop&q=80&w=600",
+      imageUrl: "/images/regulator.webp",
+      price: 349,
+      originalPrice: 499,
+      rating: 4.7,
+      reviews: 2100,
     },
   ];
 

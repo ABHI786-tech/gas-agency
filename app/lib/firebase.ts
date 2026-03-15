@@ -2,7 +2,8 @@
 import { initializeApp } from "firebase/app";
 // import { getAnalytics } from "firebase/analytics";
 import { getAuth } from "firebase/auth";
-import { collection, getDocs, getFirestore } from "firebase/firestore";
+import { getFirestore } from "firebase/firestore";
+// import { collection, getDoc } from "firebase/firestore";
 
 
 // TODO: Add SDKs for Firebase products that you want to use
@@ -31,10 +32,3 @@ export const db = getFirestore(app);
 
 
 
-// Get a list of cities from your database
-export async function getCities(db: any) {
-  const citiesCol = collection(db, 'cities');
-  const citySnapshot = await getDocs(citiesCol);
-  const cityList = citySnapshot.docs.map(doc => doc.data());
-  return cityList;
-}
